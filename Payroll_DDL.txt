@@ -1,0 +1,157 @@
+--Data Management Project- Payroll - DDL - mm222357
+--author: Mahathi Mandapati
+
+--------------------------------------------------------------------------------
+--Droping the tables
+--author: Mahathi Mandapati
+--------------------------------------------------------------------------------
+DROP TABLE PayRoll;
+DROP TABLE Leave;
+DROP TABLE Salary_Bonus;
+DROP TABLE Employee;
+DROP TABLE Job_Department;
+
+
+--------------------------------------------------------------------------------
+--Droping the sequences
+--author: Mahathi Mandapati
+--------------------------------------------------------------------------------
+DROP SEQUENCE employee_id_seq;
+DROP SEQUENCE payroll_id_seq;
+DROP SEQUENCE job_department_id_seq;
+DROP SEQUENCE leave_id_seq;
+DROP SEQUENCE salary_bonus_id_seq;
+
+--------------------------------------------------------------------------------
+--creating sequences
+--author: Mahathi Mandapati
+--------------------------------------------------------------------------------
+
+CREATE SEQUENCE employee_id_seq start with 1 increment by 1;
+CREATE SEQUENCE payroll_id_seq start with 1 increment by 1;
+CREATE SEQUENCE job_department_id_seq start with 1 increment by 1;
+CREATE SEQUENCE leave_id_seq start with 1 increment by 1;
+CREATE SEQUENCE salary_bonus_id_seq start with 1 increment by 1;
+
+--------------------------------------------------------------------------------
+--Creating tables
+--author: Mahathi Mandapati
+--------------------------------------------------------------------------------
+
+Create Table Job_Department
+(
+   JobID                   number(10)    default job_department_id_seq.nextval PRIMARY KEY,
+   JobDept                 varchar(20)   NOT NULL,
+   JobName                 varchar(20)   NOT NULL,
+   JobDescription          varchar(40)   NOT NULL,
+   SalaryRange             varchar(20)
+   );
+
+--creating employee Table
+
+Create Table Employee
+(
+   EmployeeID               number(10)      default employee_id_seq.nextval PRIMARY KEY,
+   JobID                    number(10)      REFERENCES Job_Department(JobID) NOT NULL,
+   FirstName                varchar(20)     NOT NULL, 
+   LastName                 varchar(20)     NOT NULL,
+   Gender                   varchar(1)      NOT NULL,
+   Age                      number(3)       NOT NULL,
+   Address                  varchar(30)     NOT NULL,
+   Phone                    char(12)        NOT NULL,
+   Email                    varchar(30)     NOT NULL UNIQUE    
+);
+
+--creating leave table
+
+Create Table Leave
+(
+   LeaveID               number(10)      default leave_id_seq.nextval PRIMARY KEY,
+   EmployeeID            number(10)      REFERENCES Employee(EmployeeID) NOT NULL,
+   StartDate             date            NOT NULL,
+   EndDate               date            NOT NULL,
+   Status                varchar(4)      NOT NULL,
+   Reason                varchar(30)     NOT NULL
+);
+
+--creating Salary_Bonus table
+
+Create Table Salary_Bonus
+(
+   SalaryID              number(10)     default salary_bonus_id_seq.nextval PRIMARY KEY,
+   EmployeeID            number(10)     REFERENCES Employee(EmployeeID) NOT NULL,
+   Amount                number(10)     NOT NULL,
+   Anuual                number(10)     NOT NULL,
+   Bonus                 number(10)     NOT NULL   
+);
+
+--creating PayRoll Table
+
+Create Table PayRoll
+(
+   PayRollID           number(10)     default payroll_id_seq.nextval PRIMARY KEY,
+   EmployeeID          number(10)     REFERENCES Employee(EmployeeID) NOT NULL,
+   JobID               number(10)     REFERENCES Job_Department(JobID) NOT NULL,
+   SalaryID            number(10)     REFERENCES Salary_Bonus(SalaryID) NOT NULL,
+   LeaveID             number(10)     REFERENCES Leave(LeaveID) NOT NULL,
+   Dategenerated       date           NOT NULL,
+   HoursWorked         number(4)      NOT NULL,
+   PayrollReport       varchar(40)    NOT NULL,
+   TotalAmount         number(10)     NOT NULL
+   
+);  
+
+--------------------------------------------------------------------------------
+--Inserting data in Tables
+--author: Mahathi Mandapati
+--------------------------------------------------------------------------------
+
+--Inserting into Job_Department table
+
+INSERT INTO Job_Department(JobID,JobDept,JobName,JobDescription,SalaryRange) VALUES (1,'Accounting','Accountant_level1','Takes care of data collection','100000-130000');
+INSERT INTO Job_Department(JobID,JobDept,JobName,JobDescription,SalaryRange) VALUES (2,'Marketing','Manager','Leading a team to design better strategy','120000-140000');
+INSERT INTO Job_Department(JobID,JobDept,JobName,JobDescription,SalaryRange) VALUES (3,'Development','Front End Developer','Improving the front_end interface','110000-130000');
+
+--Inserting into Employee Table
+
+INSERT INTO Employee(EmployeeID,JobID,FirstName,LastName,Gender,Age,Address,Phone,Email) VALUES (1,3,'Mahathi','Mandapati','F',24,'45TH E','+17372979545','mahathi.mandapati@netflix.com');
+INSERT INTO Employee(EmployeeID,JobID,FirstName,LastName,Gender,Age,Address,Phone,Email) VALUES (2,1,'Manya','Mandapati','F',23,'1-7,Ramalayam Street','+17372979515','manya.mandapati@netflix.com');
+INSERT INTO Employee(EmployeeID,JobID,FirstName,LastName,Gender,Age,Address,Phone,Email) VALUES (3,2,'Srinija','Mandapati','F',28,'41st E','+1737297345','srinija.mandapati@netflix.com');
+
+--Inserting into Leave TABLE
+
+INSERT INTO Leave(LeaveID,EmployeeID,StartDate,EndDate,Status,Reason) VALUES (1,1,TO_DATE('30-NOV-2022 08:00:00', 'dd-mon-yyyy hh24:mi:ss'),
+TO_DATE('3-DEC-2022 08:00:00', 'dd-mon-yyyy hh24:mi:ss'),'NACT','Personal Reasons');
+INSERT INTO Leave(LeaveID,EmployeeID,StartDate,EndDate,Status,Reason) VALUES (2,2,TO_DATE('3-DEC-2022 08:00:00', 'dd-mon-yyyy hh24:mi:ss'),
+TO_DATE('5-DEC-2022 08:00:00', 'dd-mon-yyyy hh24:mi:ss'),'NACT','Personal Reasons');
+INSERT INTO Leave(LeaveID,EmployeeID,StartDate,EndDate,Status,Reason) VALUES (3,3,TO_DATE('26-NOV-2022 08:00:00', 'dd-mon-yyyy hh24:mi:ss'),
+TO_DATE('3-DEC-2022 08:00:00', 'dd-mon-yyyy hh24:mi:ss'),'ACT','Personal Reasons');
+
+--Inserting into Salary_Bonus Table
+
+INSERT INTO Salary_Bonus(SalaryID,EmployeeID,Amount,Anuual,Bonus) VALUES (1,1,130000,1,20000);
+INSERT INTO Salary_Bonus(SalaryID,EmployeeID,Amount,Anuual,Bonus) VALUES (2,2,120000,1,15000);
+INSERT INTO Salary_Bonus(SalaryID,EmployeeID,Amount,Anuual,Bonus) VALUES (3,3,130000,1,20000);
+
+--Inserting into Payroll Table
+
+INSERT INTO PayRoll(PayRollID,EmployeeID,JobID,SalaryID,LeaveID,Dategenerated,HoursWorked,PayrollReport,TotalAmount) VALUES (1,1,3,1,1,TO_DATE('26-NOV-2022 08:00:00', 'dd-mon-yyyy hh24:mi:ss'),100,'mm222357_nov_22',100);
+INSERT INTO PayRoll(PayRollID,EmployeeID,JobID,SalaryID,LeaveID,Dategenerated,HoursWorked,PayrollReport,TotalAmount) VALUES (2,2,1,2,2,TO_DATE('26-NOV-2022 08:00:00', 'dd-mon-yyyy hh24:mi:ss'),100,'mm222357_nov_22',100);
+INSERT INTO PayRoll(PayRollID,EmployeeID,JobID,SalaryID,LeaveID,Dategenerated,HoursWorked,PayrollReport,TotalAmount) VALUES (3,3,2,3,3,TO_DATE('26-NOV-2022 08:00:00', 'dd-mon-yyyy hh24:mi:ss'),100,'mm222357_nov_22',100);
+
+--------------------------------------------------------------------------------
+--creating Indexes
+--author: Mahathi Mandapati
+--------------------------------------------------------------------------------
+
+CREATE INDEX EMPLOYEE_JOB_ID_IDX
+ON Employee (JobID);
+
+CREATE INDEX EMPLOYEE_Last_Name_IDX
+ON Employee (LastName);
+
+CREATE INDEX Salary_Employee_ID_IDX
+ON Salary_Bonus (EmployeeID);
+
+CREATE INDEX PayRoll_Employee_ID_IDX
+ON PayRoll (EmployeeID);
